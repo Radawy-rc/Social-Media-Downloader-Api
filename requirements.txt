@@ -1,0 +1,4 @@
+Flask>=2.0
+yt-dlp>=2024.12.31
+validators
+gunicorn
