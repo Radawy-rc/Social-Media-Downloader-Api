@@ -1,29 +1,63 @@
-This API extracts original video URLs and metadata from a given video link. It uses yt-dlp so it supports TikTok, YouTube, Instagram, Twitter/X, Facebook, Vimeo and many others.
+# Video Extractor API
 
-## Endpoints
-POST /extract
-JSON body: { "url": "<video_url>" }
+## Overview
+A REST API for extracting the original video URL and metadata from a given video link on any supported platform (TikTok, YouTube, Instagram, Facebook, Twitter/X, Vimeo, and more) using yt-dlp.
 
-Response: { "ok": true, "data": { ... } }
+## How the API Works
+- **Input:** A video URL sent via a `POST` request to the `/extract` endpoint.
+- **Processing:** The URL is analyzed using yt-dlp to extract available metadata.
+- **Output:** JSON containing video ID, title, uploader name, thumbnail, description, list of formats with direct URLs, and the best quality direct link (`best_url`).
 
-`data` includes: id, title, uploader, thumbnail, description, formats (list), best_url (best direct media URL).
+## Example Request
+```
+curl -X POST http://localhost:5000/extract \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://www.tiktok.com/@scout2015/video/6718335390845095173"}'
+```
 
-## Run locally
-1. python -m venv venv && source venv/bin/activate
-2. pip install -r requirements.txt
-3. python app.py
+## Example Response
+```json
+{
+  "ok": true,
+  "data": {
+    "id": "6718335390845095173",
+    "title": "Example title",
+    "uploader": "scout2015",
+    "thumbnail": "https://...jpg",
+    "best_url": "https://...mp4",
+    "formats": [
+      {
+        "format_id": "720p",
+        "ext": "mp4",
+        "url": "https://...mp4"
+      }
+    ]
+  }
+}
+```
 
-## Docker
+## Running Locally
+1. Create a virtual environment:
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+2. Run the app:
+```
+python app.py
+```
+
+## Using Docker
+```
 docker build -t video-extractor .
 docker run -p 5000:5000 video-extractor
+```
 
-## Example
-curl -X POST http://localhost:5000/extract -H "Content-Type: application/json" -d '{"url":"https://www.tiktok.com/@scout2015/video/6718335390845095173"}'
-
-## Notes and caveats
-- yt-dlp respects site access methods. Some platforms block direct access or return signed urls that expire. `best_url` might be time-limited.
-- Make sure you comply with copyright and platform ToS when downloading content.
-- For production add rate limiting, authentication, logging, and caching.
+## Notes
+- Some platforms return temporary signed URLs.
+- Respect copyright laws and each platform's terms of service.
+- For production, add authentication, rate limiting, and caching.
 
 # ---------- optional: simple test (test_extract.py) ----------
 import requests
